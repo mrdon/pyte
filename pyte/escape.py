@@ -166,3 +166,9 @@ DECSTBM = "r"
 
 #: *Horizontal position adjust*: Same as :data:`CHA`.
 HPA = "'"
+
+#: *Metadata start*
+METASTART = "{"
+
+#: *Metadata end
+METAEND = "}"

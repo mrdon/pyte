@@ -26,11 +26,13 @@ TEXT = {
     3: "+italics",
     4: "+underscore",
     7: "+reverse",
+    8: "+hidden",
     9: "+strikethrough",
     22: "-bold",
     23: "-italics",
     24: "-underscore",
     27: "-reverse",
+    28: "-hidden",
     29: "-strikethrough"
 }
 

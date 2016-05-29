@@ -27,6 +27,7 @@
 from __future__ import absolute_import, unicode_literals, division
 
 import copy
+import json
 import math
 import operator
 from collections import deque, namedtuple
@@ -61,6 +62,7 @@ Savepoint = namedtuple("Savepoint", [
     "wrap"
 ])
 
+
 #: A container for a single character, field names are *hopefully*
 #: self-explanatory.
 _Char = namedtuple("_Char", [
@@ -72,6 +74,8 @@ _Char = namedtuple("_Char", [
     "underscore",
     "strikethrough",
     "reverse",
+    "hidden",
+    "meta"
 ])
 
 
@@ -83,10 +87,12 @@ class Char(_Char):
 
     def __new__(cls, data, fg="default", bg="default", bold=False,
                 italics=False, underscore=False, reverse=False,
-                strikethrough=False):
+                strikethrough=False, hidden=None, meta=None):
         return super(Char, cls).__new__(cls, data, fg, bg, bold, italics,
-                                        underscore, strikethrough, reverse)
+                                        underscore, strikethrough, reverse, hidden, meta)
 
+    def __hash__(self):
+        return hash(self.data)
 
 class Cursor(object):
     """Screen cursor.
@@ -902,6 +908,14 @@ class Screen(object):
 
         .. versionadded:: 0.5.0
         """
+
+    def set_metadata(self, data=None):
+        print("setting meta: {}".format(data))
+        if data is None:
+            self.cursor.attrs = self.cursor.attrs._replace(meta=None)
+        else:
+            data_json = json.loads(data)
+            self.cursor.attrs = self.cursor.attrs._replace(meta=data_json)
 
 
 class DiffScreen(Screen):

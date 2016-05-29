@@ -35,6 +35,7 @@ import sys
 import warnings
 from collections import defaultdict, namedtuple
 
+from pyte.escape import METAEND, METASTART
 from . import control as ctrl, escape as esc
 from .compat import str
 
@@ -128,7 +129,7 @@ class Stream(object):
         esc.SGR: "select_graphic_rendition",
         esc.DSR: "report_device_status",
         esc.DECSTBM: "set_margins",
-        esc.HPA: "cursor_to_column"
+        esc.HPA: "cursor_to_column",
     }
 
     def __init__(self):
@@ -287,6 +288,7 @@ class Stream(object):
                 private = False
                 while True:
                     char = yield
+
                     if char == "?":
                         private = True
                     elif char in ALLOWED_IN_CSI:
@@ -305,6 +307,14 @@ class Stream(object):
                         current += char
                     else:
                         params.append(min(int(current or 0), 9999))
+                        if char == METASTART:
+                            mdata = []
+                            for idx in range(int(current)):
+                                c = yield
+                                mdata.append(c)
+                            dispatch('set_metadata', "".join(mdata))
+                        elif char == METAEND:
+                            dispatch('set_metadata')
 
                         if char == ";":
                             current = ""
